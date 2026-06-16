@@ -3,8 +3,6 @@ import dairy from "./dairy_eggs.png.jpeg";
 import drinks from "./drinks.png.jpeg";
 import frozen from "./frozen_foods.png.jpeg";
 import fruits from "./fruits_vegetables.png.jpeg";
-import heroImg from "./hero.png";
-import heroBg from "./hero_bg.jpeg.jpeg";
 import meat from "./meat_seafood.jpg.jpeg";
 import pantry from "./pantry_staples.png.jpeg";
 import personal from "./personal_care.jpg.jpeg";
