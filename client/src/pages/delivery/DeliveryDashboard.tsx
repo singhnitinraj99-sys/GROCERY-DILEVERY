@@ -1,18 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { PackageIcon, NavigationIcon } from "lucide-react";
+import OtpModal from "../../components/Delivery/OtpModal";
+import CancelModal from "../../components/Delivery/CancelModal";
+import DeliveryOrderCard from "../../components/Delivery/DeliveryOrderCard";
 import Loading from "../../components/Loading";
 import type { Order } from "../../types";
+import axios from "axios";
 import toast from "react-hot-toast";
-//import axios from "axios";
-// Backend Components: Import when available
-// import DeliveryOrderCard from "../../components/DeliveryOrderCard";
-// import OtpModal from "../../components/OrderTracking/OrderOTP";
-// import CancelModal from "../../components/Modals/CancelModal";
-const DeliveryOrderCard = ({ order }: any) => null;
-const OtpModal = ({ setOtpModal }: any) => null;
-const CancelModal = ({ setCancelModal }: any) => null;
 
-const API_URL = import.meta.env.VITE_BASE_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_BASE_URL || "http://localhost:3000/api";
 
 const getAuthHeaders = () => ({
     headers: { Authorization: `Bearer ${localStorage.getItem("delivery_token")}` },
@@ -38,7 +34,7 @@ export default function DeliveryDashboard() {
         setLoading(true);
         try {
             const { data } = await axios.get(`${API_URL}/delivery/my-deliveries?status=${tab}`, getAuthHeaders());
-            setOrders(data.orders);
+            setOrders(data.orders);  
         } catch (error: any) {
             toast.error(error?.response?.data?.message || "Failed to load deliveries");
         } finally {

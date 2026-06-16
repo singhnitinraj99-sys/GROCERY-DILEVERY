@@ -25,7 +25,7 @@ const Hero = () => {
     Shop Now <ArrowRightIcon />
     </Link>
      <Link to="/products" className="px-7 py-3 bg-white/10 text-white font-semibold rounded-full hover:bg-white/10 transition-all border border-white/20">
-    Browse Products <ArrowRightIcon />
+    Browse Products
     </Link>
     </div>
    </div>

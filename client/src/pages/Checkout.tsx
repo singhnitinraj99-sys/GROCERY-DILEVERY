@@ -1,83 +1,110 @@
-import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import { useCart } from "../context/CartContext"
-import { dummyAddressData } from "../assets/assets"
-import type { Address } from "../types"
-import { ArrowLeft, CheckIcon, ChevronRightIcon, CreditCardIcon, MapPinIcon } from "lucide-react"
-import CheckoutAddress from "../components/Checkout/CheckoutAddress"
-import CheckoutPayment from "../components/Checkout/CheckoutPayment"
-import CheckoutReview from "../components/Checkout/CheckoutReview"
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import type { Address } from "../types";
+import { ArrowLeft, CheckIcon, ChevronRightIcon, CreditCardIcon, MapPinIcon } from "lucide-react";
+import CheckoutAddress from "../components/Checkout/CheckoutAddress";
+import CheckoutPayment from "../components/Checkout/CheckoutPayment";
+import CheckoutReview from "../components/Checkout/CheckoutReview";
+import api from "../config/api";
+import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
 
 const Checkout = () => {
-const navigate = useNavigate()
-const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$"
+    const navigate = useNavigate();
+    const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
 
-const {items,cartTotal} = useCart()
-const {user} = {user:{addresses:dummyAddressData}}
+    const { items, cartTotal, clearCart } = useCart();
+    const { user } = useAuth();
 
-const [step,setStep] = useState("address")
-const [loading,setLoading] = useState(false)
-const [address,setAddress] = useState<Address>({
-  id:"",
-  label:"Home",
-  address:"",
-  city:"",
-  state:"",
-  zip:"",
-  isDefault:false,
-  lat:0,
-  lng:0,
-})
+    const [step, setStep] = useState("address");
+    const [loading, setLoading] = useState(false);
 
-const [paymentMethod,setPaymentMethod] = useState('card')
+    const [address, setAddress] = useState<Address>({
+        id: "",
+        label: "Home",
+        address: "",
+        city: "",
+        state: "",
+        zip: "",
+        isDefault: false,
+        lat: 0,
+        lng: 0,
+    });
 
-const deliveryFee = cartTotal  > 20 ? 0: 1.99;
-const tax = cartTotal*0.88;
-const total = cartTotal + deliveryFee + tax;
+    const [paymentMethod, setPaymentMethod] = useState("card");
 
-const steps:{key:string;label:string;icon:typeof MapPinIcon}[] = [
-  {key:"address",label:"Address", icon:MapPinIcon},
-    {key:"payment",label:"Payment", icon:CreditCardIcon},
-      {key:"review",label:"Review", icon:CheckIcon},
-]
+    const deliveryFee = cartTotal > 20 ? 0 : 1.99;
+    const tax = cartTotal * 0.08;
+    const total = cartTotal + deliveryFee + tax;
 
-const handlePlaceOrder = async () => {
-  setLoading(true)
-  navigate("/orders")
-}
+    const steps: { key: string; label: string; icon: typeof MapPinIcon }[] = [
+        { key: "address", label: "Address", icon: MapPinIcon },
+        { key: "payment", label: "Payment", icon: CreditCardIcon },
+        { key: "review", label: "Review", icon: CheckIcon },
+    ];
 
-//populate user address from user's default address
-useEffect(()=>{
-  if(user?.addresses?.length){
-    const defaultAddr = user.addresses.find((a)=>a.isDefault) || user.addresses[0]
-    setAddress({
-      id:defaultAddr?.id,
-      label:defaultAddr?.label,
-      address:defaultAddr?.address,
-      city:defaultAddr?.city,
-      state:defaultAddr?.state,
-      zip:defaultAddr?.zip,
-      isDefault:defaultAddr?.isDefault,
-      lat:defaultAddr?.lat,
-      lng:defaultAddr?.lng,
-    })  
-  }
-}, [])
+    const handlePlaceOrder = async () => {
+        setLoading(true);
+        try {
+            const orderData = {
+                items: items.map((item) => ({
+                    product: item.product.id,
+                    quantity: item.quantity,
+                })),
+                shippingAddress: address,
+                paymentMethod,
+            };
 
-if(items.length === 0){
-  return(
-    <div className="min-h-screen bg-app-cream flex-center">
-    <div className="text-center">
-    <h2 className="text-xl font-semibold text-app-green mb-2">Your cart is empty</h2>
-    <p className="">Add some product to checkout</p>
-    <button className="px-5 py-2.5 bg-app-green text-white text-sm font-medium rounded-xl hover:bg-app-green-light transition-colors" onClick={()=> navigate('/')}>
-    Browse Products
-    </button>
-    </div>
-    </div>
-  )
-}
+            const { data } = await api.post("/orders", orderData);
+            console.log(data);
+
+            if (data.url) {
+                window.location.href = data.url;
+                return;
+            }
+            clearCart();
+            toast.success("Order placed successfully!");
+            navigate(`/orders/${data.order.id}`);
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || error.message);
+        } finally {
+            setLoading(false);
+            scrollTo(0, 0);
+        }
+    };
+
+    // Populate address from user's default address
+    useState(() => {
+        if (user?.addresses?.length) {
+            const defaultAddr = user.addresses.find((a) => a.isDefault) || user.addresses[0];
+            setAddress({
+                id: defaultAddr?.id,
+                label: defaultAddr?.label,
+                address: defaultAddr?.address,
+                city: defaultAddr?.city,
+                state: defaultAddr?.state,
+                zip: defaultAddr?.zip,
+                isDefault: defaultAddr?.isDefault,
+                lat: defaultAddr?.lat,
+                lng: defaultAddr?.lng,
+            });
+        }
+    });
+
+    if (items.length === 0) {
+        return (
+            <div className="min-h-screen bg-app-cream flex-center">
+                <div className="text-center">
+                    <h2 className="text-xl font-semibold text-app-green mb-2">Your cart is empty</h2>
+                    <p className="text-sm text-app-text-light mb-4">Add some products to checkout</p>
+                    <button onClick={() => navigate("/products")} className="px-5 py-2.5 bg-app-green text-white text-sm font-medium rounded-xl hover:bg-app-green-light transition-colors">
+                        Browse Products
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-app-cream">
@@ -108,7 +135,7 @@ if(items.length === 0){
 
                         {step === "payment" && <CheckoutPayment paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} setStep={setStep} />}
 
-                        {step === "review" && <CheckoutReview  address={address} items={items} handlePlaceOrder={handlePlaceOrder} loading={loading} total={total} />}
+                        {step === "review" && <CheckoutReview address={address} items={items} handlePlaceOrder={handlePlaceOrder} loading={loading} total={total} />}
                     </div>
 
                     {/* Order Summary Sidebar */}
@@ -149,8 +176,7 @@ if(items.length === 0){
                 </div>
             </div>
         </div>
+    );
+};
 
-  )
-}
-
-export default Checkout
+export default Checkout;

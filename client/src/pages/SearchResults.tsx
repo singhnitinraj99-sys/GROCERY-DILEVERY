@@ -1,27 +1,31 @@
-import { useEffect, useState } from "react"
-import type { Product } from "../types"
-import { Link, useSearchParams } from "react-router-dom"
-import { dummyProducts } from "../assets/assets"
-import Loading from "../components/Loading"
-import { Home, Search } from "lucide-react"
-import ProductCard from "../components/ProductCard"
+import { useEffect, useState } from "react";
+import type { Product } from "../types";
+import { Link, useSearchParams } from "react-router-dom";
+import { Home, Search } from "lucide-react";
+import Loading from "../components/Loading";
+import ProductCard from "../components/ProductCard";
+import api from "../config/api";
+import toast from "react-hot-toast";
 
 const SearchResults = () => {
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [searchParams] = useSearchParams();
+    const query = searchParams.get("q") || "";
 
-  const [products,setProducts] = useState<Product[]>([])
-  const [loading,setLoading] = useState(true)
-  const [searchParams] = useSearchParams()
-  const query = searchParams.get('q') || "";
+    useEffect(() => {
+        if (!query) return;
+        setLoading(true);
+        api.get(`/products?search=${encodeURIComponent(query)}`)
+            .then((res) => setProducts(res.data.products))
+            .catch((error: any) => {
+                toast.error(error.response?.data?.message || error.message);
+            })
+            .finally(() => setLoading(false));
+    }, [query]);
 
-  useEffect(()=>{
-    if(!query) return;
-    setLoading(true)
-    setProducts(dummyProducts.filter((p:any)=> p.name.toLowerCase().includes(query.toLowerCase())))
-setLoading(false)
-  },[query])
-
-  return (
-     <div className="min-h-screen bg-app-cream">
+    return (
+        <div className="min-h-screen bg-app-cream">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 {/* Breadcrumb */}
                 <nav className="flex items-center gap-2 text-sm text-app-text-light mb-6">
@@ -38,7 +42,7 @@ setLoading(false)
                     <h1 className="text-2xl font-semibold text-app-green mb-1">Results for "{query}"</h1>
                     <p className="text-sm text-app-text-light">{loading ? "Searching..." : `${products.length} items found`}</p>
                 </div>
- 
+
                 {/* Results */}
                 {loading ? (
                     <Loading />
@@ -60,7 +64,7 @@ setLoading(false)
                 )}
             </div>
         </div>
-  )
-}
+    );
+};
 
-export default SearchResults
+export default SearchResults;

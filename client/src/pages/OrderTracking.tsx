@@ -1,33 +1,57 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom";
 import type { Order } from "../types";
-import { dummyDashboardOrdersData } from "../assets/assets";
 import Loading from "../components/Loading";
 import { ArrowLeftIcon, MapPinIcon, PhoneIcon } from "lucide-react";
 import OrderOTP from "../components/OrderTracking/OrderOTP";
 import LiveMap from "../components/OrderTracking/LiveMap";
 import OrderTimeLine from "../components/OrderTracking/OrderTimeLine";
-
+import api from "../config/api";
 
 const OrderTracking = () => {
+    const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [order, setOrder] = useState<Order | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [liveLocation, setLiveLocation] = useState<{ lat: number; lng: number } | null>(null);
 
-const {id} = useParams();
-const navigate = useNavigate()
-const [order,setOrder] = useState<Order | null>(null)
-const [loading,setLoading] = useState(true)
-const [liveLocation] = useState<{lat:number;lng:number}| null>(null)
-const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
+    useEffect(() => {
+        api.get(`/orders/${id}`)
+            .then((res) => setOrder(res.data.order))
+            .catch(() => navigate("/orders"))
+            .finally(() => setLoading(false));
+    }, [id, navigate]);
 
-useEffect(()=>{
-  setOrder(dummyDashboardOrdersData.find((o)=>o.id === id) as any)
-  setLoading(false)
-},[id,navigate])
+    // live location every 10 seconds
+    useEffect(() => {
+        if (!order || ["Delivered", "Cancelled", "Placed"].includes(order.status)) return;
 
-if(loading) return <Loading/>
-if(!order) return null
+        const fetchLocation = async () => {
+            try {
+                const { data } = await api.get(`/orders/${id}/location`);
+                if (data.liveLocation?.lat && data.liveLocation?.lng && data.liveLocation.updatedAt) {
+                    setLiveLocation({
+                        lat: data.liveLocation.lat,
+                        lng: data.liveLocation.lng,
+                    });
+                }
+                // Also update order status if it changed
+                if (data.status && data.status !== order.status) {
+                    setOrder((prev) => (prev ? { ...prev, status: data.status } : prev));
+                }
+            } catch {}
+        };
+        fetchLocation();
+        const interval = setInterval(fetchLocation, 10000);
+        return () => clearInterval(interval);
+    }, [id, order?.status]);
 
-  return (
-   <div className="min-h-screen mb-20 bg-app-cream">
+    if (loading) return <Loading />;
+    if (!order) null;
+
+    return (
+        <div className="min-h-screen mb-20 bg-app-cream">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header */}
                 <button onClick={() => navigate("/orders")} className="flex items-center gap-2 text-sm text-app-text-light hover:text-app-green mb-6 transition-colors">
@@ -48,8 +72,8 @@ if(!order) return null
                         {/* OTP Card */}
                         <OrderOTP order={order} />
                         {/* Live Tracking Map */}
-                       <LiveMap order={order} liveLocation={liveLocation} />
-                        {/* Progress Timeline */}  
+                        <LiveMap order={order} liveLocation={liveLocation} />
+                        {/* Progress Timeline */}
                         <OrderTimeLine order={order} />
 
                         {/* Delivery Person */}
@@ -143,7 +167,7 @@ if(!order) return null
                 </div>
             </div>
         </div>
-  )
-}
+    );
+};
 
-export default OrderTracking
+export default OrderTracking;

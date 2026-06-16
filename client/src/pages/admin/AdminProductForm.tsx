@@ -1,16 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "lucide-react";
-import { categoriesData } from "../../assets/categories";
+import { categoriesData } from "../../assets/assets";
 import Loading from "../../components/Loading";
+import api from "../../config/api";
 import toast from "react-hot-toast";
-// Backend API: Uncomment when ready
-// import api from "../../config/api";
-const api = { 
-  get: async (_url: string) => ({ data: { product: {} } }), 
-  post: async (_url: string, _data: any) => ({ data: { url: "" } }), 
-  put: async (_url: string, _data: any) => ({}) 
-};
 
 export default function AdminProductForm() {
     const { id } = useParams();
@@ -38,7 +32,7 @@ export default function AdminProductForm() {
             try {
                 if (isEdit) {
                     const { data: prodData } = await api.get(`/products/${id}`);
-                    const p = prodData.product as any;
+                    const p = prodData.product;
                     setFormData({
                         name: p.name,
                         description: p.description,
@@ -60,7 +54,7 @@ export default function AdminProductForm() {
         fetchData();
     }, [id, isEdit]);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         setSaving(true);
         try {
@@ -135,7 +129,7 @@ export default function AdminProductForm() {
                                     className="w-full px-4 py-2.5 rounded-lg border border-zinc-200 focus:border-app-green focus:ring-1 focus:ring-app-green outline-none transition-all bg-white"
                                 >
                                     <option value="">Select a category</option>
-                                    {categoriesData.map((c: any) => (
+                                    {categoriesData.map((c) => (
                                         <option key={c.slug} value={c.slug}>
                                             {c.name}
                                         </option>

@@ -2,14 +2,8 @@ import { useEffect, useState } from "react";
 import { PlusIcon, XIcon, TruckIcon, PhoneIcon, MailIcon } from "lucide-react";
 import type { DeliveryPartner } from "../../types";
 import Loading from "../../components/Loading";
+import api from "../../config/api";
 import toast from "react-hot-toast";
-// Backend API: Uncomment when ready
-// import api from "../../config/api";
-const api = { 
-  get: async (_url: string) => ({ data: { partners: [] } }), 
-  post: async (_url: string, _data: any) => ({}), 
-  put: async (_url: string, _data: any) => ({}) 
-};
 
 export default function AdminDeliveryPartners() {
     const [partners, setPartners] = useState<DeliveryPartner[]>([]);
@@ -33,7 +27,7 @@ export default function AdminDeliveryPartners() {
         fetchPartners();
     }, []);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         setSaving(true);
         try {

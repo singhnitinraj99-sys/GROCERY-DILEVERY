@@ -3,11 +3,7 @@ import { Link } from "react-router-dom";
 import { PackageIcon, UsersIcon, ShoppingBagIcon, AlertTriangleIcon } from "lucide-react";
 import Loading from "../../components/Loading";
 import { statusColors } from "../../assets/assets";
-// Backend API Configuration: Uncomment and setup when backend is ready
-// import api from "../../config/api";
-const api = { 
-  get: async (_url: string) => ({ data: { totalOrders: 0, totalUsers: 0, totalProducts: 0, outOfStock: 0, recentOrders: [] } }), 
-};
+import api from "../../config/api";
 
 interface Stats {
     totalOrders: number;

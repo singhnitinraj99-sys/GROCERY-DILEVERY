@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <rect width="100%" height="100%" fill="#FDEFEA" />
+  <g transform="translate(40,60)">
+    <rect width="720" height="480" rx="20" fill="#FFF6F6" stroke="#F8D7DA" stroke-width="4" />
+    <circle cx="120" cy="160" r="80" fill="#FFD1DC" />
+    <rect x="220" y="90" width="420" height="140" rx="12" fill="#FFEFEF" />
+    <text x="360" y="175" font-family="Arial, Helvetica, sans-serif" font-size="36" fill="#C04848" text-anchor="middle">Baby Care</text>
+    <text x="360" y="215" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#9A2E2E" text-anchor="middle">Placeholder image</text>
+  </g>
+</svg>

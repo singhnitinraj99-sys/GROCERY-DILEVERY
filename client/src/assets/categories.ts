@@ -20,6 +20,5 @@ export const categoriesData = [
   { name: "Pantry Staples", slug: "pantry-staples", image: pantry },
   { name: "Personal Care", slug: "personal-care", image: personal },
   { name: "Snacks", slug: "snacks", image: snacks },
-  { name: "Featured", slug: "featured", image: heroImg },
-  { name: "Home Banner", slug: "home-banner", image: heroBg },
+  
 ];

@@ -2,10 +2,11 @@ import { ArrowUpRightIcon, BikeIcon, ChevronDownIcon, LogOutIcon, MapPinIcon, Me
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   // Mock data - replace with actual auth/context logic later
-  const user: any = { name: "John Doe", email: "john.doe@example.com", isAdmin: true };
+  const { user,logout} = useAuth()
 
   const { cartCount, setIsCartOpen } = useCart()
   
@@ -23,6 +24,7 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
+    logout()
     setUserMenuOpen(false);
     navigate("/");
   }
@@ -94,7 +96,7 @@ const Navbar = () => {
              { userMenuOpen && (
               <>
               <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
-                <div className="absolute right-0 mt-2.5 w-56 rounded-xl shadow-lg border border-app-border py-2 z-50 animate-fade-in">
+                <div className="absolute right-0 mt-2.5 w-56 bg-white rounded-xl shadow-lg border border-app-border py-2 z-50 animate-fade-in">
                {user && (
                <div className="px-4 py-2 border-b border-app-border">
                 <p className="text-sm font-medium">{user?.name}</p>

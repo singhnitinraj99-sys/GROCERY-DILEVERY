@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react"
 import type { Product } from "../types"
-import { dummyProducts } from "../assets/assets"
 import { Zap } from "lucide-react"
 import Loading from "../components/Loading"
 import ProductCard from "../components/ProductCard"
+import api from "../config/api"
+import toast from "react-hot-toast"
 
 const FlashDeals = () => {
 
@@ -11,8 +12,8 @@ const FlashDeals = () => {
   const [loading,setLoading] = useState(false)
 
 useEffect(()=>{
-  setProducts(dummyProducts.filter((p:any)=> p.stock>0))
-  setLoading(false)
+  api.get("/products/flash-deals").then((res)=> setProducts(res.data.products)).catch((error:any)=> toast.error(error.response.data.
+    message || error?.message)).finally(()=> setLoading(false))
 }, [])
 
   return (

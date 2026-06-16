@@ -1,7 +1,7 @@
 import { XIcon } from "lucide-react"
 
 
-const AdressForm = ({resetForm,handleSubmit,form,setForm,editingId} :any) => {
+const AddressForm = ({resetForm,handleSubmit,form,setForm,editingId} :any) => {
 
   return (
     <>
@@ -70,4 +70,4 @@ const AdressForm = ({resetForm,handleSubmit,form,setForm,editingId} :any) => {
   )
 }
 
-export default AdressForm
+export default AddressForm

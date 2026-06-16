@@ -1,9 +1,7 @@
 import { Navigate, NavLink, Outlet } from "react-router-dom";
 import { PlusIcon, PackageSearchIcon, ShoppingBagIcon, LogOutIcon, BarChart3Icon, ShieldIcon, Truck } from "lucide-react";
 import Navbar from "../../components/Navbar";
-// Backend Authentication: Uncomment when AuthContext is setup
-// import { useAuth } from "../../context/AuthContext";
-const useAuth = () => ({ user: { isAdmin: true }, loading: false });
+import { useAuth } from "../../context/AuthContext";
 
 export default function AdminLayout() {
     const { user, loading } = useAuth();

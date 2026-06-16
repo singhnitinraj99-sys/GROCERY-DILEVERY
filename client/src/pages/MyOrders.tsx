@@ -2,41 +2,51 @@ import { useEffect, useState } from "react";
 import type { Order } from "../types";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { dummyDashboardOrdersData, statusColors } from "../assets/assets";
-import { CalendarIcon, ChevronRightIcon, PackageIcon } from "lucide-react";
+import { statusColors } from "../assets/assets";
 import Loading from "../components/Loading";
+import { CalendarIcon, ChevronRightIcon, PackageIcon } from "lucide-react";
+import api from "../config/api";
+import toast from "react-hot-toast";
 
 const MyOrders = () => {
+    const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
 
-const currency = import.meta.env.VITE_CURRENCY_SYMBOL;
-const [orders,setOrders] = useState<Order[]>([])
-const [loading,setLoading] = useState(true)
-const [activeTab,setActiveTab] = useState("all")
-const [searchParams,setSearchParams] = useSearchParams()
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState("all");
+    const [searchParams, setSearchParams] = useSearchParams();
 
-const tabs = ["all","Placed","Out for Delivery","Delivered"]
+    const tabs = ["all", "Placed", "Out for Delivery", "Delivered"];
 
-const {clearCart} = useCart()
+    const { clearCart } = useCart();
 
-const fetchOrders = async () =>{
-  setOrders(dummyDashboardOrdersData as any )
-  setLoading(false)
-}
+    const fetchOrders = async () => {
+        setLoading(true);
+        try {
+            const params = activeTab !== "all" ? `?status=${activeTab}` : "";
+            const { data } = await api.get(`/orders${params}`);
+            setOrders(data.orders);
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || error?.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-useEffect(()=>{
-  if(searchParams.get("clearChat")){
-    clearCart();
-    setSearchParams({});
-    setTimeout(()=>{
-      fetchOrders()
-    },2000)
-  } else {
-    fetchOrders()
-  }
-},[activeTab])
+    useEffect(() => {
+        if (searchParams.get("clearCart")) {
+            clearCart();
+            setSearchParams({});
+            setTimeout(() => {
+                fetchOrders();
+            }, 2000);
+        } else {
+            fetchOrders();
+        }
+    }, [activeTab]);
 
-  return (
-<div className="min-h-screen bg-app-cream mb-20">
+    return (
+        <div className="min-h-screen bg-app-cream mb-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <h1 className="text-2xl font-semibold text-app-green mb-6">My Orders</h1>
 
@@ -106,8 +116,7 @@ useEffect(()=>{
                 )}
             </div>
         </div>
+    );
+};
 
-  )
-}
-
-export default MyOrders
+export default MyOrders;

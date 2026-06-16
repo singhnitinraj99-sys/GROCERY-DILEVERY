@@ -3,13 +3,8 @@ import { Link } from "react-router-dom";
 import { PlusIcon, EditIcon, XIcon } from "lucide-react";
 import type { Product } from "../../types";
 import Loading from "../../components/Loading";
+import api from "../../config/api";
 import toast from "react-hot-toast";
-// Backend API: Uncomment when ready
-// import api from "../../config/api";
-const api = { 
-  get: async (_url: string) => ({ data: { products: [] } }), 
-  delete: async (_url: string) => ({}) 
-};
 
 export default function AdminProducts() {
     const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";

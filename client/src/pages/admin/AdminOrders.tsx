@@ -3,13 +3,7 @@ import { TruckIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import type { DeliveryPartner } from "../../types";
 import Loading from "../../components/Loading";
-// Backend API: Uncomment when ready
-// import api from "../../config/api";
-const api = { 
-  get: async (_url: string) => ({ data: { orders: [], partners: [] } }), 
-  put: async (_url: string, _data: any) => ({}) 
-};
-
+import api from "../../config/api";
 
 export default function AdminOrders() {
     const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
